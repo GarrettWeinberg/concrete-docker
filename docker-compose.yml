@@ -1,0 +1,47 @@
+version: "3.7"
+
+services:
+  web:
+    build: ./docker/web
+    container_name: ${SITE_NAME}_web
+    image: ${SITE_NAME}_web # Explicitly tag the web image with SITE_NAME
+    ports:
+      - "80:80"
+    volumes:
+      - ./app:/app
+    env_file:
+      - .env
+    environment:
+      - DB_HOST=${SITE_NAME}_db
+      - DB_NAME=${SITE_NAME}_db
+      - DB_USER=${DB_USER}
+      - DB_PASSWORD=${DB_PASSWORD}
+    depends_on:
+      - db
+    networks:
+      default:
+        aliases:
+          - ${SITE_NAME}_web
+
+  db:
+    image: mysql:8
+    container_name: ${SITE_NAME}_db
+    hostname: ${SITE_NAME}_db
+    restart: always
+    env_file:
+      - .env
+    environment:
+      - MYSQL_ROOT_PASSWORD=${DB_ROOT_PASSWORD}
+      - MYSQL_DATABASE=${SITE_NAME}_db
+      - MYSQL_USER=${DB_USER}
+      - MYSQL_PASSWORD=${DB_PASSWORD}
+    networks:
+      default:
+        aliases:
+          - ${SITE_NAME}_db
+    volumes:
+      - db_data:/var/lib/mysql
+
+volumes:
+  db_data:
+    name: ${SITE_NAME}_db_data

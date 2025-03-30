@@ -1,0 +1,22 @@
+<VirtualHost *:80>
+    ServerName localhost
+    DocumentRoot /app
+
+    # Map /mysite to /app/public
+    Alias /${SITE_NAME} /app/public
+
+    <Directory /app/public>
+        Options Indexes FollowSymLinks
+        AllowOverride All
+        Require all granted
+    </Directory>
+
+    # Rewrite any request starting with /mysite/ so that Concrete sees it at the root
+    <Location /${SITE_NAME}>
+        RewriteEngine On
+        RewriteRule ^/${SITE_NAME}/(.*)$ /$1 [L]
+    </Location>
+
+    ErrorLog ${APACHE_LOG_DIR}/error.log
+    CustomLog ${APACHE_LOG_DIR}/access.log combined
+</VirtualHost>
